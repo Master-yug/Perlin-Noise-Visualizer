@@ -4,10 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Generative Art Studio | Flow Field Explorer</title>
+    
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- p5.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+    <!-- p5.svg.js for SVG export -->
     <script src="https://unpkg.com/p5.js-svg@1.5.1"></script>
-   
+    
     <style>
         body, html {
             margin: 0;
@@ -23,6 +27,8 @@
             left: 0;
             z-index: -1;
         }
+        
+        /* Custom scrollbar */
         .custom-scrollbar::-webkit-scrollbar {
             width: 6px;
         }
@@ -34,11 +40,15 @@
             background: rgba(255, 255, 255, 0.3);
             border-radius: 3px;
         }
+        
+        /* Glass morphism effect */
         .glass-panel {
             background: rgba(20, 20, 30, 0.85);
             backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
+        
+        /* Gradient borders */
         .gradient-border {
             position: relative;
             border: double 2px transparent;
@@ -50,6 +60,7 @@
     </style>
 </head>
 <body class="bg-gray-900 text-white">
+    <!-- Main UI Panel -->
     <div class="fixed top-0 left-0 w-full z-10">
         <div class="container mx-auto px-4 py-4">
             <div class="glass-panel rounded-2xl p-6 max-w-4xl mx-auto shadow-2xl">
@@ -79,11 +90,15 @@
             </div>
         </div>
     </div>
+
+    <!-- Controls Panel -->
     <div class="fixed top-28 left-4 z-10">
         <div class="glass-panel rounded-2xl p-6 w-80 max-h-[75vh] overflow-y-auto custom-scrollbar shadow-2xl">
             <div class="space-y-6">
                 <div>
                     <h2 class="text-lg font-semibold mb-4 text-purple-300">🎛️ Flow Field Controls</h2>
+                    
+                    <!-- Noise Scale Control -->
                     <div class="mb-5">
                         <div class="flex justify-between items-center mb-2">
                             <label class="text-sm font-medium text-gray-300">Noise Scale</label>
@@ -96,6 +111,8 @@
                             <span>Squiggliest</span>
                         </div>
                     </div>
+                    
+                    <!-- Particle Speed Control -->
                     <div class="mb-5">
                         <div class="flex justify-between items-center mb-2">
                             <label class="text-sm font-medium text-gray-300">Particle Speed</label>
@@ -108,6 +125,8 @@
                             <span>Fast</span>
                         </div>
                     </div>
+                    
+                    <!-- Particle Count Control -->
                     <div class="mb-5">
                         <div class="flex justify-between items-center mb-2">
                             <label class="text-sm font-medium text-gray-300">Particle Count</label>
@@ -120,6 +139,8 @@
                             <span>5000</span>
                         </div>
                     </div>
+                    
+                    <!-- Lifespan/Fade Control -->
                     <div class="mb-5">
                         <div class="flex justify-between items-center mb-2">
                             <label class="text-sm font-medium text-gray-300">Trail Length</label>
@@ -132,6 +153,8 @@
                             <span>Long</span>
                         </div>
                     </div>
+                    
+                    <!-- Color Palette Selection -->
                     <div class="mb-5">
                         <label class="block text-sm font-medium text-gray-300 mb-2">Color Palette</label>
                         <select id="colorPalette" 
@@ -144,6 +167,8 @@
                             <option value="cyber">Cyberpunk</option>
                         </select>
                     </div>
+                    
+                    <!-- Particle Size -->
                     <div class="mb-5">
                         <div class="flex justify-between items-center mb-2">
                             <label class="text-sm font-medium text-gray-300">Particle Size</label>
@@ -152,6 +177,8 @@
                         <input type="range" id="particleSize" min="0.5" max="8" step="0.1" value="2.0" 
                                class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-gradient-to-r [&::-webkit-slider-thumb]:from-pink-400 [&::-webkit-slider-thumb]:to-rose-500">
                     </div>
+                    
+                    <!-- Flow Strength -->
                     <div class="mb-5">
                         <div class="flex justify-between items-center mb-2">
                             <label class="text-sm font-medium text-gray-300">Flow Strength</label>
@@ -196,60 +223,106 @@
             </div>
         </div>
     </div>
+
+    <!-- Particle System Script -->
     <script>
+        // ============================
+        // PARTICLE CLASS
+        // ============================
         class Particle {
             constructor() {
+                // Initialize particle at a random position
                 this.pos = createVector(random(width), random(height));
+                // Velocity starts at zero
                 this.vel = createVector(0, 0);
+                // Acceleration for smooth movement
                 this.acc = createVector(0, 0);
+                // Maximum speed limit
                 this.maxSpeed = 4;
+                // Trail history for smooth lines
                 this.history = [];
+                // Maximum trail length
                 this.maxHistory = 20;
+                // Random color offset for visual variation
                 this.colorOffset = random(TWO_PI);
+                // Current color based on palette
                 this.color = [255, 255, 255];
             }
+            
+            // Update particle position based on flow field
             update(flowField, noiseScale, particleSpeed, flowStrength) {
+                // Get the grid cell the particle is in
                 let x = floor(this.pos.x / flowField.resolution);
                 let y = floor(this.pos.y / flowField.resolution);
+                // Ensure we're within bounds
                 x = constrain(x, 0, flowField.cols - 1);
                 y = constrain(y, 0, flowField.rows - 1);
+                
+                // Get the force vector from the flow field at this position
+                // The flow field stores angles, so we convert to vector
                 let force = flowField.field[x][y].copy();
                 force.setMag(particleSpeed * flowStrength);
+                
+                // Apply the force as acceleration
                 this.acc.add(force);
+                // Update velocity with acceleration
                 this.vel.add(this.acc);
+                // Limit maximum speed for stability
                 this.vel.limit(this.maxSpeed);
+                // Update position
                 this.pos.add(this.vel);
+                // Reset acceleration for next frame
                 this.acc.mult(0);
+                
+                // Handle screen wrapping
                 if (this.pos.x > width) this.pos.x = 0;
                 if (this.pos.x < 0) this.pos.x = width;
                 if (this.pos.y > height) this.pos.y = 0;
                 if (this.pos.y < 0) this.pos.y = height;
+                
+                // Add current position to history for trails
                 this.history.push(this.pos.copy());
+                // Limit history length for performance
                 if (this.history.length > this.maxHistory) {
                     this.history.splice(0, 1);
                 }
             }
+            
+            // Draw the particle with its trail
             show(particleSize, colorPalette, time) {
+                // Calculate color based on palette and time
                 this.updateColor(colorPalette, time);
+                
+                // If we have history, draw the trail
                 if (this.history.length > 1) {
+                    // Begin shape for continuous line
                     beginShape();
                     noFill();
+                    // Set color with some transparency
                     stroke(this.color[0], this.color[1], this.color[2], 150);
                     strokeWeight(particleSize);
+                    
+                    // Draw each point in history
                     for (let i = 0; i < this.history.length; i++) {
                         vertex(this.history[i].x, this.history[i].y);
                     }
                     endShape();
                 }
+                
+                // Draw current position as a small circle
                 fill(this.color[0], this.color[1], this.color[2], 200);
                 noStroke();
                 circle(this.pos.x, this.pos.y, particleSize * 1.5);
             }
+            
+            // Update color based on selected palette
             updateColor(palette, time) {
+                // Add time-based animation to color
                 let t = time * 0.001 + this.colorOffset;
                 
                 switch(palette) {
                     case 'neon':
+                        // Neon Night: Electric blues and purples
                         this.color = [
                             map(sin(t), -1, 1, 100, 255),
                             map(cos(t * 1.3), -1, 1, 50, 200),
@@ -258,6 +331,7 @@
                         break;
                         
                     case 'ocean':
+                        // Ocean Mist: Blues and greens
                         this.color = [
                             map(sin(t * 0.8), -1, 1, 0, 100),
                             map(cos(t * 1.2), -1, 1, 100, 200),
@@ -266,11 +340,13 @@
                         break;
                         
                     case 'monochrome':
+                        // Monochrome: Grayscale
                         let brightness = map(sin(t), -1, 1, 150, 255);
                         this.color = [brightness, brightness, brightness];
                         break;
-                    
+                        
                     case 'sunset':
+                        // Desert Sunset: Oranges and purples
                         this.color = [
                             map(sin(t), -1, 1, 200, 255),
                             map(cos(t * 1.5), -1, 1, 50, 150),
@@ -279,6 +355,7 @@
                         break;
                         
                     case 'forest':
+                        // Enchanted Forest: Greens and yellows
                         this.color = [
                             map(sin(t * 0.7), -1, 1, 50, 150),
                             map(cos(t), -1, 1, 150, 255),
@@ -287,6 +364,7 @@
                         break;
                         
                     case 'cyber':
+                        // Cyberpunk: Pinks and cyans
                         this.color = [
                             map(sin(t), -1, 1, 200, 255),
                             map(cos(t * 0.5), -1, 1, 0, 100),
@@ -296,6 +374,10 @@
                 }
             }
         }
+
+        // ============================
+        // FLOW FIELD CLASS
+        // ============================
         class FlowField {
             constructor(resolution) {
                 this.resolution = resolution;
@@ -306,47 +388,73 @@
                 for (let i = 0; i < this.cols; i++) {
                     this.field[i] = new Array(this.rows);
                 }
+                // Time offset for animation
                 this.zoff = 0;
             }
+            
+            // Generate Perlin noise-based flow field
             update(noiseScale, animate) {
                 let xoff = 0;
+                
+                // Iterate through grid cells
                 for (let i = 0; i < this.cols; i++) {
-                    let yoff = 0;                    
+                    let yoff = 0;
+                    
                     for (let j = 0; j < this.rows; j++) {
+                        // Get Perlin noise value (range -1 to 1)
+                        // Using 3D noise for time-based animation
                         let angle;
                         if (animate) {
                             angle = noise(xoff, yoff, this.zoff) * TWO_PI * 4;
                         } else {
                             angle = noise(xoff, yoff) * TWO_PI * 4;
                         }
+                        
+                        // Create vector from angle
                         let v = p5.Vector.fromAngle(angle);
+                        // Store in field
                         this.field[i][j] = v;
+                        
+                        // Increment y offset for noise
                         yoff += noiseScale;
                     }
+                    // Increment x offset for noise
                     xoff += noiseScale;
                 }
+                
+                // Increment z offset for animation
                 if (animate) {
                     this.zoff += 0.01;
                 }
             }
+            
+            // Display the flow field (for debugging)
             display() {
                 for (let i = 0; i < this.cols; i++) {
                     for (let j = 0; j < this.rows; j++) {
                         push();
+                        // Draw vector at grid position
                         let x = i * this.resolution;
                         let y = j * this.resolution;
                         translate(x + this.resolution/2, y + this.resolution/2);
                         stroke(255, 50);
                         strokeWeight(1);
+                        // Draw line showing vector direction
                         line(0, 0, this.field[i][j].x * 10, this.field[i][j].y * 10);
                         pop();
                     }
                 }
             }
         }
+
+        // ============================
+        // MAIN SKETCH
+        // ============================
         let particles = [];
         let flowField;
         let canvas;
+        
+        // Parameters with defaults
         let params = {
             noiseScale: 0.005,
             particleSpeed: 2.0,
@@ -358,6 +466,8 @@
             animateNoise: true,
             showFlowField: false
         };
+        
+        // Color palettes for reference
         const palettes = {
             neon: { bg: [10, 10, 20] },
             ocean: { bg: [5, 20, 30] },
@@ -366,73 +476,125 @@
             forest: { bg: [10, 20, 15] },
             cyber: { bg: [5, 0, 15] }
         };
+        
+        // Setup function - runs once
         function setup() {
+            // Create canvas matching window size
             canvas = createCanvas(windowWidth, windowHeight);
             canvas.position(0, 0);
             canvas.style('z-index', '-1');
+            
+            // Create flow field with 20px resolution
             flowField = new FlowField(20);
+            
+            // Initialize particles
             initParticles();
+            
+            // Set up UI event listeners
             setupUI();
+            
+            // Initial flow field generation
             flowField.update(params.noiseScale, params.animateNoise);
         }
+        
+        // Draw function - runs every frame
         function draw() {
+            // Get current palette background
             let bgColor = palettes[params.colorPalette].bg;
+            
+            // Draw background with trail effect
+            // Lower alpha = longer trails
             let alpha = map(params.lifespan, 1, 100, 50, 5);
             background(bgColor[0], bgColor[1], bgColor[2], alpha);
+            
+            // Update flow field with animation
             flowField.update(params.noiseScale, params.animateNoise);
+            
+            // Update and display all particles
             for (let particle of particles) {
                 particle.update(flowField, params.noiseScale, params.particleSpeed, params.flowStrength);
                 particle.show(params.particleSize, params.colorPalette, millis());
             }
+            
+            // Display flow field if enabled (for debugging)
             if (params.showFlowField) {
                 flowField.display();
             }
+            
+            // Update stats display
             updateStats();
+            
+            // Update UI values
             updateUIValues();
         }
+        
+        // Initialize particle system
         function initParticles() {
             particles = [];
             for (let i = 0; i < params.particleCount; i++) {
                 particles.push(new Particle());
             }
+            
+            // Update max history for trail length
             for (let particle of particles) {
                 particle.maxHistory = params.lifespan;
             }
         }
+        
+        // Set up UI event listeners
         function setupUI() {
+            // Noise Scale
             document.getElementById('noiseScale').addEventListener('input', (e) => {
                 params.noiseScale = parseFloat(e.target.value);
                 document.getElementById('noiseScaleValue').textContent = params.noiseScale.toFixed(3);
             });
+            
+            // Particle Speed
             document.getElementById('particleSpeed').addEventListener('input', (e) => {
                 params.particleSpeed = parseFloat(e.target.value);
                 document.getElementById('particleSpeedValue').textContent = params.particleSpeed.toFixed(1);
             });
+            
+            // Particle Count
             document.getElementById('particleCount').addEventListener('input', (e) => {
                 params.particleCount = parseInt(e.target.value);
                 document.getElementById('particleCountValue').textContent = params.particleCount;
                 initParticles();
             });
+            
+            // Lifespan
             document.getElementById('lifespan').addEventListener('input', (e) => {
                 params.lifespan = parseInt(e.target.value);
                 document.getElementById('lifespanValue').textContent = params.lifespan;
+                
+                // Update all particles
                 for (let particle of particles) {
                     particle.maxHistory = params.lifespan;
                 }
             });
+            
+            // Color Palette
             document.getElementById('colorPalette').addEventListener('change', (e) => {
                 params.colorPalette = e.target.value;
             });
+            
+            // Particle Size
             document.getElementById('particleSize').addEventListener('input', (e) => {
                 params.particleSize = parseFloat(e.target.value);
                 document.getElementById('particleSizeValue').textContent = params.particleSize.toFixed(1);
             });
+            
+            // Flow Strength
             document.getElementById('flowStrength').addEventListener('input', (e) => {
                 params.flowStrength = parseFloat(e.target.value);
                 document.getElementById('flowStrengthValue').textContent = params.flowStrength.toFixed(1);
             });
+            
+            // Update UI values on load
             updateUIValues();
         }
+        
+        // Update UI display values
         function updateUIValues() {
             document.getElementById('noiseScaleValue').textContent = params.noiseScale.toFixed(3);
             document.getElementById('particleSpeedValue').textContent = params.particleSpeed.toFixed(1);
@@ -442,18 +604,31 @@
             document.getElementById('flowStrengthValue').textContent = params.flowStrength.toFixed(1);
             document.getElementById('colorPalette').value = params.colorPalette;
         }
+        
+        // Update statistics display
         function updateStats() {
             document.getElementById('statsParticles').textContent = params.particleCount;
             document.getElementById('statsFPS').textContent = frameRate().toFixed(0);
         }
+        
+        // Save as PNG
         function savePNG() {
             saveCanvas('generative-art-' + Date.now(), 'png');
+            
+            // Visual feedback
             flashMessage('PNG saved!');
         }
+        
+        // Save as SVG
         function saveSVG() {
+            // Create a temporary SVG canvas
             let svgCanvas = createGraphics(width, height, SVG);
+            
+            // Draw current state to SVG
             svgCanvas.background(palettes[params.colorPalette].bg);
             svgCanvas.push();
+            
+            // Redraw all particles to SVG
             for (let particle of particles) {
                 if (particle.history.length > 1) {
                     svgCanvas.beginShape();
@@ -469,19 +644,32 @@
             }
             
             svgCanvas.pop();
+            
+            // Save the SVG
             save(svgCanvas, 'generative-art-' + Date.now(), 'svg');
+            
+            // Clean up
             svgCanvas.remove();
+            
+            // Visual feedback
             flashMessage('SVG saved!');
         }
+        
+        // Randomize all parameters
         function randomizeAll() {
+            // Random values within reasonable ranges
             params.noiseScale = random(0.001, 0.02);
             params.particleSpeed = random(0.5, 8);
             params.particleCount = floor(random(500, 3000));
             params.lifespan = floor(random(5, 50));
             params.particleSize = random(0.5, 5);
             params.flowStrength = random(0.5, 2);
+            
+            // Random palette
             const paletteKeys = Object.keys(palettes);
             params.colorPalette = random(paletteKeys);
+            
+            // Update UI elements
             document.getElementById('noiseScale').value = params.noiseScale;
             document.getElementById('particleSpeed').value = params.particleSpeed;
             document.getElementById('particleCount').value = params.particleCount;
@@ -489,29 +677,44 @@
             document.getElementById('particleSize').value = params.particleSize;
             document.getElementById('flowStrength').value = params.flowStrength;
             document.getElementById('colorPalette').value = params.colorPalette;
+            
+            // Reinitialize particles
             initParticles();
+            
+            // Visual feedback
             flashMessage('Randomized!');
         }
+        
+        // Flash a temporary message
         function flashMessage(text) {
+            // Create message element
             let message = document.createElement('div');
             message.textContent = text;
             message.className = 'fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black/80 text-white px-6 py-3 rounded-lg font-medium z-50 animate-pulse';
             document.body.appendChild(message);
+            
+            // Remove after delay
             setTimeout(() => {
                 message.remove();
             }, 1000);
         }
-
+        
+        // Mouse click resets particles to mouse position
         function mousePressed() {
+            // Only respond if not clicking on UI elements
             if (mouseX > 350 && mouseY > 150) {
                 for (let particle of particles) {
                     particle.pos = createVector(mouseX + random(-50, 50), mouseY + random(-50, 50));
                     particle.history = [];
                     particle.vel = createVector(0, 0);
                 }
+                
+                // Visual feedback
                 flashMessage('Particles reset!');
             }
         }
+        
+        // Handle window resize
         function windowResized() {
             resizeCanvas(windowWidth, windowHeight);
             flowField = new FlowField(20);
