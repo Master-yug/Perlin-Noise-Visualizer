@@ -16,7 +16,6 @@
 
 ## Export Functionality
 - Export PNG - High-resolution raster export
-- Export SVG - Vector export using p5.svg.js library
 - Randomize Button - Creates surprising new configurations
 
 ## Creative Features
@@ -30,6 +29,6 @@
 - Save the code as index.html
 - Open in browser - that's it! No build process needed
 - Adjust sliders to see real-time changes
-- Click Export for PNG or SVG
+- Click Export for PNG
 - Try Randomize for unexpected results
 - Click canvas to reset particles from mouse position
