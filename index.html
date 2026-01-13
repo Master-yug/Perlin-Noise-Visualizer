@@ -67,12 +67,12 @@
         }
         
         /* Individual slider thumb colors using CSS gradients */
-        #noiseScale::-webkit-slider-thumb { background: linear-gradient(45deg, #8b5cf6, #ec4899); }
-        #particleSpeed::-webkit-slider-thumb { background: linear-gradient(45deg, #3b82f6, #06b6d4); }
-        #particleCount::-webkit-slider-thumb { background: linear-gradient(45deg, #10b981, #059669); }
-        #lifespan::-webkit-slider-thumb { background: linear-gradient(45deg, #f59e0b, #f97316); }
-        #particleSize::-webkit-slider-thumb { background: linear-gradient(45deg, #ec4899, #f43f5e); }
-        #flowStrength::-webkit-slider-thumb { background: linear-gradient(45deg, #8b5cf6, #4f46e5); }
+        #noiseScale::-webkit-slider-thumb { background: linear-gradient(45deg, #00fde3, #00e9d1); }
+        #particleSpeed::-webkit-slider-thumb { background: linear-gradient(45deg, #00E9D1, #00D6C0); }
+        #particleCount::-webkit-slider-thumb { background: linear-gradient(45deg, #00D6C0, #00C2AE); }
+        #lifespan::-webkit-slider-thumb { background: linear-gradient(45deg, #00C2AE, #009B8B); }
+        #particleSize::-webkit-slider-thumb { background: linear-gradient(45deg, #009B8B, #008779); }
+        #flowStrength::-webkit-slider-thumb { background: linear-gradient(45deg, #008779, #007468); }
     </style>
 </head>
 <body class="bg-gray-900 text-white">
@@ -107,7 +107,7 @@
                     <div class="mb-5">
                         <div class="flex justify-between items-center mb-2">
                             <label class="text-sm font-medium text-[#B0EBD2]">Noise Scale</label>
-                            <span id="noiseScaleValue" class="text-sm font-mono bg-gray-800 px-2 py-1 rounded">0.005</span>
+                            <span id="noiseScaleValue" class="text-sm text-[#2BB789] font-mono bg-gray-800 px-2 py-1 rounded">0.005</span>
                         </div>
                         <input type="range" id="noiseScale" min="0.001" max="0.02" step="0.001" value="0.005" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
                         <div class="flex justify-between text-xs text-gray-400 mt-1"><span>Smoothest</span><span>Squiggliest</span></div>
@@ -117,7 +117,7 @@
                     <div class="mb-5">
                         <div class="flex justify-between items-center mb-2">
                             <label class="text-sm font-medium text-[#B0EBD2]">Particle Speed</label>
-                            <span id="particleSpeedValue" class="text-sm font-mono bg-gray-800 px-2 py-1 rounded">2.0</span>
+                            <span id="particleSpeedValue" class="text-sm text-[#2BB789] font-mono bg-gray-800 px-2 py-1 rounded">2.0</span>
                         </div>
                         <input type="range" id="particleSpeed" min="0.1" max="10" step="0.1" value="2.0" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
                         <div class="flex justify-between text-xs text-gray-400 mt-1"><span>Slow</span><span>Fast</span></div>
@@ -127,7 +127,7 @@
                     <div class="mb-5">
                         <div class="flex justify-between items-center mb-2">
                             <label class="text-sm font-medium text-[#B0EBD2]">Particle Count</label>
-                            <span id="particleCountValue" class="text-sm font-mono bg-gray-800 px-2 py-1 rounded">2000</span>
+                            <span id="particleCountValue" class="text-sm text-[#2BB789] font-mono bg-gray-800 px-2 py-1 rounded">2000</span>
                         </div>
                         <input type="range" id="particleCount" min="500" max="5000" step="100" value="1200" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
                         <div class="flex justify-between text-xs text-gray-400 mt-1"><span>500</span><span>5000</span></div>
@@ -137,7 +137,7 @@
                     <div class="mb-5">
                         <div class="flex justify-between items-center mb-2">
                             <label class="text-sm font-medium text-[#B0EBD2]">Trail Length</label>
-                            <span id="lifespanValue" class="text-sm font-mono bg-gray-800 px-2 py-1 rounded">20</span>
+                            <span id="lifespanValue" class="text-sm text-[#2BB789] font-mono bg-gray-800 px-2 py-1 rounded">6</span>
                         </div>
                         <input type="range" id="lifespan" min="0" max="50" step="1" value="6" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
                         <div class="flex justify-between text-xs text-gray-400 mt-1"><span>None</span><span>Long</span></div>
@@ -146,7 +146,7 @@
                     <!-- Color Palette selection -->
                     <div class="mb-5">
                         <label class="block text-sm font-medium text-[#B0EBD2] mb-2">Color Palette</label>
-                        <select id="colorPalette" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        <select id="colorPalette" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-[#2BB789] focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent">
                             <option value="ocean">Ocean Mist</option>
                             <option value="neon">Neon Night</option>                            
                             <option value="monochrome">Monochrome</option>
@@ -160,7 +160,7 @@
                     <div class="mb-5">
                         <div class="flex justify-between items-center mb-2">
                             <label class="text-sm font-medium text-[#B0EBD2]">Particle Size</label>
-                            <span id="particleSizeValue" class="text-sm font-mono bg-gray-800 px-2 py-1 rounded">2.0</span>
+                            <span id="particleSizeValue" class="text-sm text-[#2BB789] font-mono bg-gray-800 px-2 py-1 rounded">2.0</span>
                         </div>
                         <input type="range" id="particleSize" min="0.5" max="8" step="0.1" value="2.0" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
                     </div>
@@ -169,7 +169,7 @@
                     <div class="mb-5">
                         <div class="flex justify-between items-center mb-2">
                             <label class="text-sm font-medium text-[#B0EBD2]">Flow Strength</label>
-                            <span id="flowStrengthValue" class="text-sm font-mono bg-gray-800 px-2 py-1 rounded">1.0</span>
+                            <span id="flowStrengthValue" class="text-sm text-[#2BB789] font-mono bg-gray-800 px-2 py-1 rounded">1.0</span>
                         </div>
                         <input type="range" id="flowStrength" min="0.1" max="3.0" step="0.1" value="1.0" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
                     </div>
