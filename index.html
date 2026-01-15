@@ -1,46 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Meta tags for character encoding and responsive viewport -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Perlin Noise Visualizer</title>
-    
-    <!-- External libraries -->
-    <script src="https://cdn.tailwindcss.com"></script> <!-- Tailwind CSS for styling -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script> <!-- p5.js for graphics and animation -->
-    
+    <script src="https://cdn.tailwindcss.com"></script> 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>     
     <style>
-        /* Reset and base styles */
         body, html { 
             margin: 0; 
             padding: 0; 
-            overflow: hidden; /* Prevent scrollbars */
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; /* Modern font stack */
+            overflow: hidden;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; 
         }
-        
-        /* Canvas positioning */
         canvas { 
             display: block; 
             position: fixed; 
             top: 0; 
             left: 0; 
-            z-index: -1; /* Place behind UI elements */
+            z-index: -1;
         }
-        
-        /* Custom scrollbar for UI panels */
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.1); border-radius: 3px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.3); border-radius: 3px; }
-        
-        /* Glassmorphism effect for UI panels */
         .glass-panel { 
-            background: rgba(20, 20, 30, 0.85); /* Semi-transparent dark background */
-            backdrop-filter: blur(12px); /* Blur effect for glassmorphism */
-            border: 1px solid rgba(255, 255, 255, 0.1); /* Subtle border */
+            background: rgba(20, 20, 30, 0.85); 
+            backdrop-filter: blur(12px); 
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        
-        /* Animation for flash messages */
         @keyframes fadeInOut { 
             0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); } 
             20% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 
@@ -48,8 +35,6 @@
             100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); } 
         }
         .flash-message { animation: fadeInOut 1.5s ease-in-out; pointer-events: none; }
-        
-        /* Custom slider styling */
         input[type="range"]::-webkit-slider-thumb { 
             -webkit-appearance: none; 
             appearance: none; 
@@ -65,8 +50,6 @@
             border-radius: 3px; 
             background: rgba(255, 255, 255, 0.1); 
         }
-        
-        /* Individual slider thumb colors using CSS gradients */
         #noiseScale::-webkit-slider-thumb { background: linear-gradient(45deg, #00fde3, #00e9d1); }
         #particleSpeed::-webkit-slider-thumb { background: linear-gradient(45deg, #00E9D1, #00D6C0); }
         #particleCount::-webkit-slider-thumb { background: linear-gradient(45deg, #00D6C0, #00C2AE); }
@@ -76,7 +59,6 @@
     </style>
 </head>
 <body class="bg-gray-900 text-white">
-    <!-- Top header panel with title and action buttons -->
     <div class="fixed top-0 left-0 w-full z-10">
         <div class="container mx-auto px-4 py-4">
             <div class="glass-panel rounded-2xl p-6 max-w-4xl mx-auto shadow-2xl">
@@ -86,24 +68,18 @@
                         <p class="text-[#238182] text-sm mt-1">Perlin Noise Flow Field with Particle System</p>
                     </div>
                     <div class="flex gap-3">
-                        <!-- Button to export canvas as PNG -->
                         <button id="savePNG" class="px-4 py-2 bg-[#00C2AE] hover:bg-[#B0EBD2] rounded-lg font-medium transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-lg">Export PNG</button>
-                        <!-- Button to randomize all parameters -->
                         <button id="randomizeBtn" class="px-4 py-2 bg-[#2BB789] hover:bg-[#B0EBD2] rounded-lg font-medium transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-lg">Randomize</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- Left control panel with all adjustable parameters -->
     <div class="fixed top-32 left-2 z-10">
         <div class="glass-panel rounded-2xl p-6 w-80 max-h-[75vh] overflow-y-auto custom-scrollbar shadow-2xl">
             <div class="space-y-6">
                 <div>
                     <h2 class="text-lg font-semibold mb-4 text-[#00C2AE]">Flow Field Controls</h2>
-                    
-                    <!-- Noise Scale control -->
                     <div class="mb-5">
                         <div class="flex justify-between items-center mb-2">
                             <label class="text-sm font-medium text-[#B0EBD2]">Noise Scale</label>
@@ -112,8 +88,6 @@
                         <input type="range" id="noiseScale" min="0.001" max="0.02" step="0.001" value="0.005" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
                         <div class="flex justify-between text-xs text-gray-400 mt-1"><span>Smoothest</span><span>Squiggliest</span></div>
                     </div>
-                    
-                    <!-- Particle Speed control -->
                     <div class="mb-5">
                         <div class="flex justify-between items-center mb-2">
                             <label class="text-sm font-medium text-[#B0EBD2]">Particle Speed</label>
@@ -122,8 +96,6 @@
                         <input type="range" id="particleSpeed" min="0.1" max="10" step="0.1" value="2.0" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
                         <div class="flex justify-between text-xs text-gray-400 mt-1"><span>Slow</span><span>Fast</span></div>
                     </div>
-                    
-                    <!-- Particle Count control -->
                     <div class="mb-5">
                         <div class="flex justify-between items-center mb-2">
                             <label class="text-sm font-medium text-[#B0EBD2]">Particle Count</label>
@@ -132,8 +104,6 @@
                         <input type="range" id="particleCount" min="500" max="5000" step="100" value="1200" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
                         <div class="flex justify-between text-xs text-gray-400 mt-1"><span>500</span><span>5000</span></div>
                     </div>
-                    
-                    <!-- Trail Length (lifespan) control -->
                     <div class="mb-5">
                         <div class="flex justify-between items-center mb-2">
                             <label class="text-sm font-medium text-[#B0EBD2]">Trail Length</label>
@@ -142,8 +112,6 @@
                         <input type="range" id="lifespan" min="0" max="50" step="1" value="6" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
                         <div class="flex justify-between text-xs text-gray-400 mt-1"><span>None</span><span>Long</span></div>
                     </div>
-                    
-                    <!-- Color Palette selection -->
                     <div class="mb-5">
                         <label class="block text-sm font-medium text-[#B0EBD2] mb-2">Color Palette</label>
                         <select id="colorPalette" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-[#2BB789] focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent">
@@ -155,8 +123,6 @@
                             <option value="cyber">Cyberpunk</option>
                         </select>
                     </div>
-                    
-                    <!-- Particle Size control -->
                     <div class="mb-5">
                         <div class="flex justify-between items-center mb-2">
                             <label class="text-sm font-medium text-[#B0EBD2]">Particle Size</label>
@@ -164,8 +130,6 @@
                         </div>
                         <input type="range" id="particleSize" min="0.5" max="8" step="0.1" value="2.0" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
                     </div>
-                    
-                    <!-- Flow Strength control -->
                     <div class="mb-5">
                         <div class="flex justify-between items-center mb-2">
                             <label class="text-sm font-medium text-[#B0EBD2]">Flow Strength</label>
@@ -174,8 +138,6 @@
                         <input type="range" id="flowStrength" min="0.1" max="3.0" step="0.1" value="1.0" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
                     </div>
                 </div>
-                
-                <!-- Stats display section -->
                 <div class="pt-4 border-t border-gray-700">
                     <h3 class="text-sm font-medium text-[#B0EBD2] mb-2">Stats</h3>
                     <div class="grid grid-cols-2 gap-3 text-sm">
@@ -192,8 +154,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Help panel in bottom right -->
     <div class="fixed bottom-4 right-4 z-10">
         <div class="glass-panel rounded-2xl p-4 max-w-xs">
             <div class="flex items-start gap-3">
@@ -210,60 +170,35 @@
             </div>
         </div>
     </div>
-
-    <!-- Main JavaScript code -->
     <script>
-        /**
-         * Particle class representing individual particles in the flow field
-         * Each particle follows the flow field and leaves a trail
-         */
         class Particle {
             constructor() {
-                // Initialize particle with random position
                 this.pos = createVector(random(width), random(height));
-                this.vel = createVector(0, 0); // Velocity vector
-                this.acc = createVector(0, 0); // Acceleration vector
-                this.maxSpeed = 4; // Maximum speed limit
-                this.history = []; // Previous positions for trail (deprecated in favor of segments)
-                this.maxHistory = 20; // Maximum trail length
-                this.colorOffset = random(TWO_PI); // Offset for color animation
-                this.color = [255, 255, 255]; // Current RGB color
-                this.prevPos = this.pos.copy(); // Previous position
-                this.segments = []; // Array of trail segments (for handling screen wrapping)
-                this.currentSegment = []; // Current continuous trail segment
+                this.vel = createVector(0, 0);
+                this.acc = createVector(0, 0);
+                this.maxSpeed = 4; 
+                this.history = []; 
+                this.maxHistory = 20; 
+                this.colorOffset = random(TWO_PI); 
+                this.color = [255, 255, 255]; 
+                this.prevPos = this.pos.copy();
+                this.segments = []; 
+                this.currentSegment = []; 
             }
-            
-            /**
-             * Update particle position based on flow field
-             * @param {FlowField} flowField - The flow field to follow
-             * @param {number} noiseScale - Scale of Perlin noise
-             * @param {number} particleSpeed - Speed multiplier
-             * @param {number} flowStrength - Strength of flow field force
-             */
             update(flowField, noiseScale, particleSpeed, flowStrength) {
-                // Calculate grid position in flow field
                 let x = floor(this.pos.x / flowField.resolution);
                 let y = floor(this.pos.y / flowField.resolution);
                 x = constrain(x, 0, flowField.cols - 1);
                 y = constrain(y, 0, flowField.rows - 1);
-                
-                // Get force from flow field at current position
                 let force = flowField.field[x][y].copy();
-                force.setMag(particleSpeed * flowStrength); // Scale force by parameters
-                this.acc.add(force); // Apply force
-                
-                // Update velocity and position
+                force.setMag(particleSpeed * flowStrength); 
+                this.acc.add(force); 
                 this.vel.add(this.acc);
                 this.vel.limit(this.maxSpeed);
-                
-                // Store previous position for trail
                 let prevX = this.pos.x;
-                let prevY = this.pos.y;
-                
+                let prevY = this.pos.y;                
                 this.pos.add(this.vel);
-                this.acc.mult(0); // Reset acceleration
-                
-                // Handle screen wrapping and trail segmentation
+                this.acc.mult(0); 
                 let wrapped = false;
                 if (this.pos.x > width) {
                     this.pos.x = 0;
@@ -281,45 +216,34 @@
                     this.pos.y = height;
                     wrapped = true;
                 }
-                
-                // Manage trail segments for continuous drawing across screen edges
                 if (!wrapped) {
                     if (this.currentSegment.length === 0) {
                         this.currentSegment.push(createVector(prevX, prevY));
                     }
                     this.currentSegment.push(this.pos.copy());
                 } else {
-                    // When wrapping occurs, save current segment and start new one
                     if (this.currentSegment.length > 0) {
                         this.segments.push([...this.currentSegment]);
                         this.currentSegment = [];
                     }
                     this.currentSegment.push(this.pos.copy());
                 }
-                
-                // Limit total trail points to prevent memory issues
                 while (this.segments.length > 0 && this.getTotalPoints() > this.maxHistory) {
                     if (this.segments[0].length > 1) {
-                        this.segments[0].shift(); // Remove oldest point from first segment
+                        this.segments[0].shift(); 
                     } else {
-                        this.segments.shift(); // Remove empty segment
+                        this.segments.shift(); 
                     }
                 }
                 while (this.currentSegment.length > 0 && this.getTotalPoints() > this.maxHistory) {
                     if (this.currentSegment.length > 1) {
-                        this.currentSegment.shift(); // Remove oldest point from current segment
+                        this.currentSegment.shift(); 
                     } else {
-                        this.currentSegment = []; // Clear if only one point
+                        this.currentSegment = []; 
                     }
-                }
-                
-                this.prevPos = this.pos.copy(); // Update previous position
+                }                
+                this.prevPos = this.pos.copy();
             }
-            
-            /**
-             * Calculate total number of points in all trail segments
-             * @returns {number} Total points
-             */
             getTotalPoints() {
                 let total = this.currentSegment.length;
                 for (let seg of this.segments) {
@@ -327,21 +251,11 @@
                 }
                 return total;
             }
-            
-            /**
-             * Draw the particle and its trail
-             * @param {number} particleSize - Size of particle
-             * @param {string} colorPalette - Current color palette name
-             * @param {number} time - Current time in milliseconds
-             */
             show(particleSize, colorPalette, time) {
-                this.updateColor(colorPalette, time); // Update color based on palette
-                
-                // Draw trail segments
-                stroke(this.color[0], this.color[1], this.color[2], 180); // Semi-transparent trail
+                this.updateColor(colorPalette, time); 
+                stroke(this.color[0], this.color[1], this.color[2], 180); 
                 strokeWeight(particleSize);
-                noFill();
-                
+                noFill();                
                 for (let seg of this.segments) {
                     if (seg.length > 1) {
                         beginShape();
@@ -351,8 +265,6 @@
                         endShape();
                     }
                 }
-                
-                // Draw current segment
                 if (this.currentSegment.length > 1) {
                     beginShape();
                     for (let i = 0; i < this.currentSegment.length; i++) {
@@ -360,22 +272,12 @@
                     }
                     endShape();
                 }
-                
-                // Draw particle head
                 fill(this.color[0], this.color[1], this.color[2], 220);
                 noStroke();
                 circle(this.pos.x, this.pos.y, particleSize * 1.2);
             }
-            
-            /**
-             * Update particle color based on selected palette
-             * @param {string} palette - Palette name
-             * @param {number} time - Current time for animation
-             */
             updateColor(palette, time) {
-                let t = time * 0.001 + this.colorOffset; // Time with individual offset
-                
-                // Different color algorithms for each palette
+                let t = time * 0.001 + this.colorOffset; 
                 switch(palette) {
                      case 'ocean': 
                         this.color = [
@@ -419,31 +321,17 @@
                 }
             }
         }
-        
-        /**
-         * Flow Field class representing a grid of vectors based on Perlin noise
-         */
         class FlowField {
-            /**
-             * Create flow field with given resolution
-             * @param {number} resolution - Grid cell size in pixels
-             */
             constructor(resolution) {
                 this.resolution = resolution;
-                this.cols = floor(width / resolution); // Number of columns
-                this.rows = floor(height / resolution); // Number of rows
+                this.cols = floor(width / resolution);
+                this.rows = floor(height / resolution); 
                 this.field = new Array(this.cols);
                 for (let i = 0; i < this.cols; i++) { 
                     this.field[i] = new Array(this.rows); 
                 }
-                this.zoff = 0; // Z-offset for 3D noise animation
+                this.zoff = 0; 
             }
-            
-            /**
-             * Update flow field vectors based on Perlin noise
-             * @param {number} noiseScale - Scale of noise sampling
-             * @param {boolean} animate - Whether to animate noise over time
-             */
             update(noiseScale, animate) {
                 let xoff = 0;
                 for (let i = 0; i < this.cols; i++) {
@@ -451,13 +339,10 @@
                     for (let j = 0; j < this.rows; j++) {
                         let angle;
                         if (animate) { 
-                            // 3D noise for animation over time
                             angle = noise(xoff, yoff, this.zoff) * TWO_PI * 4; 
                         } else { 
-                            // 2D noise for static field
                             angle = noise(xoff, yoff) * TWO_PI * 4; 
                         }
-                        // Create vector from angle
                         let v = p5.Vector.fromAngle(angle);
                         this.field[i][j] = v;
                         yoff += noiseScale;
@@ -465,17 +350,13 @@
                     xoff += noiseScale;
                 }
                 if (animate) { 
-                    this.zoff += 0.01; // Increment z-offset for animation
+                    this.zoff += 0.01;
                 }
             }
         }
-        
-        // Global variables
-        let particles = []; // Array of all particles
-        let flowField; // Flow field instance
-        let canvas; // p5.js canvas reference
-        
-        // Parameters object with default values
+        let particles = []; 
+        let flowField; 
+        let canvas; 
         let params = {
             noiseScale: 0.005,
             particleSpeed: 2.0,
@@ -484,10 +365,8 @@
             colorPalette: 'ocean',
             particleSize: 2.0,
             flowStrength: 1.0,
-            animateNoise: true // Whether to animate the noise field
+            animateNoise: true 
         };
-        
-        // Background colors for each palette
         const palettes = {
             neon: { bg: [10, 10, 20] },
             ocean: { bg: [5, 20, 30] },
@@ -496,123 +375,74 @@
             forest: { bg: [10, 20, 15] },
             cyber: { bg: [5, 0, 15] }
         };
-        
-        /**
-         * p5.js setup function - runs once at initialization
-         */
         function setup() {
-            // Create canvas covering entire window
             canvas = createCanvas(windowWidth, windowHeight);
             canvas.position(0, 0);
             canvas.style('z-index', '-1');
-            
-            // Initialize flow field and particles
             flowField = new FlowField(20);
             initParticles();
             setupUI();
             flowField.update(params.noiseScale, params.animateNoise);
         }
-        
-        /**
-         * p5.js draw function - runs every frame (animation loop)
-         */
         function draw() {
-            // Get background color for current palette
             let bgColor = palettes[params.colorPalette].bg;
-            // Calculate background alpha based on trail length (for fade effect)
             let alpha = map(params.lifespan, 0, 50, 50, 10);
             background(bgColor[0], bgColor[1], bgColor[2], alpha);
-            
-            // Update and draw flow field and particles
             flowField.update(params.noiseScale, params.animateNoise);
             for (let particle of particles) {
                 particle.update(flowField, params.noiseScale, params.particleSpeed, params.flowStrength);
                 particle.show(params.particleSize, params.colorPalette, millis());
             }
-            
-            // Update UI displays
             updateStats();
             updateUIValues();
         }
-        
-        /**
-         * Initialize particles array based on current parameters
-         */
         function initParticles() {
             particles = [];
             for (let i = 0; i < params.particleCount; i++) {
                 particles.push(new Particle());
             }
-            
-            // Update trail length for all particles
             for (let particle of particles) {
                 particle.maxHistory = params.lifespan;
                 particle.segments = [];
                 particle.currentSegment = [];
             }
         }
-        
-        /**
-         * Set up event listeners for UI controls
-         */
         function setupUI() {
-            // Save PNG button
             document.getElementById('savePNG').addEventListener('click', savePNG);
-            
-            // Randomize button
             document.getElementById('randomizeBtn').addEventListener('click', randomizeAll);
-            
-            // Noise scale slider
             document.getElementById('noiseScale').addEventListener('input', (e) => {
                 params.noiseScale = parseFloat(e.target.value);
                 document.getElementById('noiseScaleValue').textContent = params.noiseScale.toFixed(3);
             });
-            
-            // Particle speed slider
             document.getElementById('particleSpeed').addEventListener('input', (e) => {
                 params.particleSpeed = parseFloat(e.target.value);
                 document.getElementById('particleSpeedValue').textContent = params.particleSpeed.toFixed(1);
             });
-            
-            // Particle count slider
             document.getElementById('particleCount').addEventListener('input', (e) => {
                 params.particleCount = parseInt(e.target.value);
                 document.getElementById('particleCountValue').textContent = params.particleCount;
-                initParticles(); // Reinitialize particles when count changes
+                initParticles(); 
             });
-            
-            // Trail length (lifespan) slider
             document.getElementById('lifespan').addEventListener('input', (e) => {
                 params.lifespan = parseInt(e.target.value);
                 document.getElementById('lifespanValue').textContent = params.lifespan;
                 for (let particle of particles) { 
-                    particle.maxHistory = params.lifespan; // Update all particles
+                    particle.maxHistory = params.lifespan; 
                 }
             });
-            
-            // Color palette dropdown
             document.getElementById('colorPalette').addEventListener('change', (e) => {
                 params.colorPalette = e.target.value;
             });
-            
-            // Particle size slider
             document.getElementById('particleSize').addEventListener('input', (e) => {
                 params.particleSize = parseFloat(e.target.value);
                 document.getElementById('particleSizeValue').textContent = params.particleSize.toFixed(1);
             });
-            
-            // Flow strength slider
             document.getElementById('flowStrength').addEventListener('input', (e) => {
                 params.flowStrength = parseFloat(e.target.value);
                 document.getElementById('flowStrengthValue').textContent = params.flowStrength.toFixed(1);
-            });
-            
-            updateUIValues(); // Initialize UI values
+            });            
+            updateUIValues(); 
         }
-        
-        /**
-         * Update all UI value displays from parameters
-         */
         function updateUIValues() {
             document.getElementById('noiseScaleValue').textContent = params.noiseScale.toFixed(3);
             document.getElementById('particleSpeedValue').textContent = params.particleSpeed.toFixed(1);
@@ -622,40 +452,23 @@
             document.getElementById('flowStrengthValue').textContent = params.flowStrength.toFixed(1);
             document.getElementById('colorPalette').value = params.colorPalette;
         }
-        
-        /**
-         * Update statistics display (particle count and FPS)
-         */
         function updateStats() {
             document.getElementById('statsParticles').textContent = params.particleCount;
             document.getElementById('statsFPS').textContent = Math.min(60, frameRate()).toFixed(0);
         }
-        
-        /**
-         * Save current canvas as PNG image
-         */
         function savePNG() {
             saveCanvas(canvas, 'generative-art-' + Date.now(), 'png');
             flashMessage('PNG saved!');
         }
-        
-        /**
-         * Randomize all parameters and update UI
-         */
         function randomizeAll() {
-            // Generate random values for all parameters
             params.noiseScale = random(0.001, 0.02);
             params.particleSpeed = random(0.5, 8);
             params.particleCount = floor(random(500, 3000));
             params.lifespan = floor(random(0, 40));
             params.particleSize = random(0.5, 5);
             params.flowStrength = random(0.5, 2);
-            
-            // Select random palette
             const paletteKeys = Object.keys(palettes);
             params.colorPalette = random(paletteKeys);
-            
-            // Update UI sliders and dropdown
             document.getElementById('noiseScale').value = params.noiseScale;
             document.getElementById('particleSpeed').value = params.particleSpeed;
             document.getElementById('particleCount').value = params.particleCount;
@@ -663,56 +476,34 @@
             document.getElementById('particleSize').value = params.particleSize;
             document.getElementById('flowStrength').value = params.flowStrength;
             document.getElementById('colorPalette').value = params.colorPalette;
-            
-            // Reinitialize particles with new parameters
             initParticles();
             flashMessage('Randomized!');
         }
-        
-        /**
-         * Display temporary message in center of screen
-         * @param {string} text - Message to display
-         */
         function flashMessage(text) {
-            // Remove any existing message
             let existingMessage = document.querySelector('.flash-message');
             if (existingMessage) { existingMessage.remove(); }
-            
-            // Create new message element
             let message = document.createElement('div');
             message.textContent = text;
             message.className = 'flash-message fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black/80 text-white px-6 py-3 rounded-lg font-medium z-50';
             document.body.appendChild(message);
-            
-            // Remove message after animation completes
             setTimeout(() => { 
                 if (message.parentNode) { message.remove(); } 
             }, 1500);
         }
-        
-        /**
-         * p5.js mouse press handler - reset particles on click
-         */
         function mousePressed() {
-            // Only reset if not clicking on UI panels (approximate check)
             if (mouseX > 350 && mouseY > 150) {
                 for (let particle of particles) {
-                    // Move particles to click location with slight randomness
                     particle.pos = createVector(mouseX + random(-50, 50), mouseY + random(-50, 50));
-                    particle.segments = []; // Clear trails
+                    particle.segments = []; 
                     particle.currentSegment = [];
-                    particle.vel = createVector(0, 0); // Reset velocity
+                    particle.vel = createVector(0, 0); 
                 }
                 flashMessage('Particles reset!');
             }
         }
-        
-        /**
-         * p5.js window resize handler
-         */
         function windowResized() {
             resizeCanvas(windowWidth, windowHeight);
-            flowField = new FlowField(20); // Recreate flow field for new dimensions
+            flowField = new FlowField(20);
             flowField.update(params.noiseScale, params.animateNoise);
         }
     </script>
